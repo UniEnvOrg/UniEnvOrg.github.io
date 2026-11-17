@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UniEnv: one interface for robot environments and robot data</title>
+<meta name="description" content="UniEnv gives simulators, real robots and datasets one interface: typed spaces with metadata, composable worlds, backend-portable tensors, replay buffers and remote execution.">
+<meta property="og:title" content="UniEnv">
+<meta property="og:description" content="One interface for robot environments and robot data.">
+<meta property="og:url" content="https://unienvorg.github.io/">
+<link rel="icon" href="img/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15191f; --muted:#5a6370; --paper:#fbfbf9; --panel:#f2f3f1; --rule:#e2e5e3;
+  --blue:#1b5e93; --blue-ink:#154b7d; --blue-soft:#e8f0f7;
+  --teal:#2a8f75; --teal-bright:#38ab8c; --teal-soft:#e5f4ef;
+  --grad:linear-gradient(90deg,#1a5c93,#38ab8c);
+  --serif:"Source Serif 4","Iowan Old Style",Charter,Georgia,serif;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --w:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow:auto;overscroll-behavior:auto}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased;overflow:auto;overscroll-behavior:auto}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.18em}
+code,pre{font-family:var(--mono)}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 28px}
+
+/* header */
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--rule)}
+header .wrap{display:flex;align-items:center;height:60px;gap:28px}
+.brand{display:flex;align-items:center;gap:9px;color:var(--blue-ink);font-weight:600;font-size:19px;letter-spacing:-.01em}
+.brand img{width:28px;height:28px}
+.brand:hover{text-decoration:none}
+nav.top{display:flex;gap:24px;margin-left:auto;font-size:14.5px}
+nav.top a{color:var(--muted)}
+nav.top a:hover{color:var(--ink);text-decoration:none}
+nav.top a.gh{color:var(--ink);font-weight:500}
+
+/* hero */
+.hero{padding-top:76px;padding-bottom:64px;text-align:center}
+.kicker{display:inline-flex;gap:10px;align-items:center;font-size:13px;color:var(--muted);border:1px solid var(--rule);border-radius:999px;padding:4px 14px;background:#fff}
+.kicker b{color:var(--ink);font-weight:500}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,5.2vw,60px);line-height:1.08;letter-spacing:-.02em;margin:22px auto 18px;max-width:900px}
+h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:19px;color:var(--muted);max-width:680px;margin:0 auto}
+.cta{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:30px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-weight:500;font-size:15px;border:1px solid var(--blue-ink)}
+.btn.primary{background:var(--blue-ink);color:#fff}
+.btn.ghost{color:var(--blue-ink);background:transparent}
+.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.pip{display:inline-flex;align-items:center;gap:10px;font:14px var(--mono);background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:9px 14px;color:var(--ink);cursor:pointer}
+.pip span{color:var(--muted)}
+.pip small{font:12px var(--sans);color:var(--muted)}
+
+/* convergence figure */
+.converge{margin-top:56px;display:grid;grid-template-columns:318px 1fr 420px 1fr 200px;align-items:center;text-align:left}
+.converge > div{padding-top:0}
+.col-title{font:500 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.sources{display:flex;flex-direction:column;gap:12px}
+.src{all:unset;cursor:pointer;display:block;background:#fff;border:1px solid var(--rule);border-radius:12px;padding:13px 15px;transition:border-color .2s,box-shadow .2s,opacity .2s;opacity:.62}
+.src:hover{opacity:.9}
+.src.on{opacity:1;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+.src .tag{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.src b{display:block;font-weight:600;font-size:15px;margin:2px 0 7px}
+.src code{display:block;font-size:11.5px;line-height:1.5;color:#22364f;background:var(--panel);border-radius:6px;padding:6px 8px;white-space:pre}
+.wires{width:100%;height:100%;display:block;align-self:stretch}
+.wires path{fill:none;stroke:#cfd6d4;stroke-width:1.6;vector-effect:non-scaling-stroke}
+.wires path.on{stroke:var(--blue);stroke-width:2;stroke-dasharray:6 6;animation:flow 1s linear infinite}
+.wires path.out{stroke:var(--teal-bright)}
+@keyframes flow{to{stroke-dashoffset:-12}}
+@media (prefers-reduced-motion:reduce){.wires path.on{animation:none}}
+
+.schema{background:#fff;border:1px solid var(--rule);border-radius:14px;overflow:hidden;box-shadow:0 1px 0 var(--rule),0 18px 40px -28px rgba(21,75,125,.35)}
+.schema-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rule);background:linear-gradient(180deg,#fff,#fafbfa)}
+.schema-head .t{font:600 13px var(--mono);color:var(--blue-ink)}
+.badge{font:500 11.5px var(--mono);padding:3px 9px;border-radius:999px;background:var(--teal-soft);color:#1f6f5b}
+.tree{font:11.8px/1.95 var(--mono);padding:10px 14px 8px;margin:0;color:var(--ink);white-space:pre}
+.tree .k{color:var(--muted)}
+.tree .sh{color:var(--blue);display:inline-block;min-width:90px}
+.tree .dt{color:#7a5aa6;display:inline-block;min-width:58px}
+.tree .md{color:var(--teal)}
+.tree .flash{animation:flash .6s}
+@keyframes flash{from{background:var(--blue-soft)}to{background:transparent}}
+.schema-foot{border-top:1px solid var(--rule);padding:10px 16px;font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center;min-height:42px}
+.schema-foot .ok{color:var(--teal);font-weight:600}
+
+.sinks{display:flex;flex-direction:column;gap:10px}
+.sink{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:10px 13px;font-size:14px;font-weight:500}
+.sink small{display:block;font:12px var(--mono);color:var(--muted);font-weight:400;margin-top:1px}
+.fig-note{margin-top:22px;color:var(--muted);font-size:13.5px;text-align:center}
+
+/* sections */
+section{padding:72px 0;border-top:1px solid var(--rule)}
+.eyebrow{font:500 12.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin:0 0 10px}
+h2{font-family:var(--serif);font-weight:600;font-size:36px;line-height:1.15;letter-spacing:-.015em;margin:0 0 14px;max-width:760px}
+.sub{color:var(--muted);font-size:17px;max-width:680px;margin:0 0 36px}
+
+/* metadata section */
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.uses{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:14px;background:#fff;overflow:hidden}
+.use{padding:18px 22px;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:92px 1fr;gap:16px}
+.use:last-child{border-bottom:0}
+.use .when{font:500 12px var(--mono);color:var(--blue);padding-top:2px}
+.use h3{font-size:15.5px;margin:0 0 3px;font-weight:600}
+.use p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.55}
+.use code{font-size:12.5px;color:#22364f}
+.codebox{background:#14202b;color:#e3e8ec;border-radius:14px;padding:20px 22px;font:12.5px/1.65 var(--mono);white-space:pre;overflow:auto;margin:0}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule);border-radius:14px;background:#fff;overflow:hidden}
+.pillar{padding:26px 24px;border-right:1px solid var(--rule)}
+.pillar:last-child{border-right:0}
+.pillar .ico{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);margin-bottom:16px}
+.pillar:nth-child(even) .ico{background:var(--teal-soft);color:var(--teal)}
+.pillar h3{font-size:16.5px;margin:0 0 6px;font-weight:600}
+.pillar p{margin:0 0 14px;color:var(--muted);font-size:14.5px;line-height:1.55}
+.pillar code{font-size:12px;background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:1px 5px;display:inline-block;margin:0 4px 4px 0;color:#22364f}
+
+/* quick start */
+.split{display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;align-items:start}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding:0 0 18px 40px;position:relative;color:var(--muted);font-size:15px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--blue-soft);color:var(--blue);font:600 13px/26px var(--sans);text-align:center}
+.steps li b{color:var(--ink);display:block;font-weight:600}
+.code{background:#14202b;color:#e3e8ec;border-radius:14px;overflow:hidden}
+.tabs{display:flex;gap:2px;padding:8px 8px 0;background:#1b2834}
+.tabs button{all:unset;cursor:pointer;font:500 13px var(--sans);color:#94a3b0;padding:8px 14px;border-radius:8px 8px 0 0}
+.tabs button[aria-selected=true]{background:#14202b;color:#fff}
+.code pre{margin:0;padding:20px 22px;font-size:12.5px;line-height:1.6;overflow:auto;display:none}
+.code pre.on{display:block}
+.k{color:#c792ea}.s{color:#b5e3a0}.f{color:#7fb6ff}.c{color:#7d8b97;font-style:italic}.n{color:#f2a97f}
+
+/* ecosystem */
+.eco-group{margin-bottom:30px}
+.eco-group h3{font:500 12.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:block;background:#fff;border:1px solid var(--rule);border-radius:12px;padding:16px 18px;color:var(--ink);transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--blue);transform:translateY(-2px);text-decoration:none}
+.card .name{font:600 14px var(--mono);display:flex;justify-content:space-between;align-items:center;gap:10px;overflow-wrap:anywhere}
+.card .name::after{content:"↗";font:14px var(--sans);color:var(--muted)}
+.card:has(.docs) .name::after{content:none}
+.card .name span{flex:none;font:500 11px var(--sans);border-radius:999px;padding:1px 8px}
+.card .name span.docs{color:var(--blue);border:1px solid color-mix(in srgb,var(--blue) 35%,transparent);background:var(--blue-soft)}
+.card p{margin:6px 0 0;color:var(--muted);font-size:13.5px;line-height:1.5}
+
+/* cite */
+.cite{display:grid;grid-template-columns:1fr 1.4fr;gap:40px;align-items:start}
+.bib{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;font:12.5px/1.6 var(--mono);white-space:pre;overflow:auto;color:#22364f}
+.bib button{position:absolute;top:10px;right:10px;font:500 12px var(--sans);border:1px solid var(--rule);background:#fff;border-radius:6px;padding:4px 10px;cursor:pointer}
+
+footer{border-top:1px solid var(--rule);padding:36px 0 48px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+footer a{color:var(--muted)}
+footer .sp{margin-left:auto}
+
+@media (max-width:1080px){
+  .converge{grid-template-columns:1fr;gap:18px}
+  .wires{display:none}
+  .sinks{flex-direction:row;flex-wrap:wrap}.sink{flex:1 1 180px}
+}
+@media (max-width:900px){
+  nav.top a:not(.gh){display:none}
+  .pillars{grid-template-columns:1fr 1fr}.pillar:nth-child(2){border-right:0}.pillar:nth-child(-n+2){border-bottom:1px solid var(--rule)}
+  .split,.cite,.meta{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="brand" href="#"><img src="img/logo.svg" alt="">UniEnv</a>
+  <nav class="top">
+    <a href="https://unienvorg.github.io/UniEnv/">Docs</a>
+    <a href="https://unienvorg.github.io/XBArray/">XBArray</a>
+    <a href="#ecosystem">Ecosystem</a>
+    <a href="#cite">Cite</a>
+    <a class="gh" href="https://github.com/UniEnvOrg/UniEnv">GitHub ↗</a>
+  </nav>
+</div></header>
+
+<main>
+<div class="wrap hero">
+  <span class="kicker"><b id="ver">on PyPI</b> · Apache-2.0 · Python 3.10+</span>
+  <h1>One interface for robot <em>environments</em> and robot <em>data</em>.</h1>
+  <p class="lede">Simulators, real robots and datasets describe their data with the same spaces. Policies, buffers and tools written against those spaces work with every source.</p>
+  <div class="cta">
+    <a class="btn primary" href="https://unienvorg.github.io/UniEnv/latest/getting-started/">Get started →</a>
+    <a class="btn ghost" href="https://github.com/UniEnvOrg/UniEnv">View on GitHub</a>
+    <button class="pip" onclick="navigator.clipboard&&navigator.clipboard.writeText('pip install unienv');this.querySelector('small').textContent='copied'"><span>$</span>pip install unienv <small>copy</small></button>
+  </div>
+
+  <div class="converge" id="converge">
+    <div>
+      <p class="col-title">Three sources</p>
+      <div class="sources">
+        <button class="src on" data-i="0"><span class="tag">Simulation</span><b>FR3 + Robotiq in Genesis</b><code>world = GenesisWorld(batch_size=8)
+env = WorldEnv(world, [
+  FrankaFR3WithRobotiq2F85(
+    world, name="robot"),
+  CameraSensorNode(
+    world, name="external_cam_0", ...)])</code></button>
+        <button class="src" data-i="1"><span class="tag">Real robot</span><b>Franka FR3 on a DROID rig</b><code>env = DroidEnv(RobotEnv())</code></button>
+        <button class="src" data-i="2"><span class="tag">Dataset</span><b>DROID recordings</b><code>data = TransformedBatch(
+    RawDroidDataset(root),
+    DroidRawToEnvTransformation())</code></button>
+      </div>
+    </div>
+    <svg class="wires" id="wires-in" aria-hidden="true"><path/><path/><path/></svg>
+    <div>
+      <p class="col-title">One observation space</p>
+      <div class="schema">
+        <div class="schema-head"><span class="t">observation_space</span><span class="badge" id="badge">torch · cuda:0</span></div>
+<pre class="tree" id="tree"><span class="k">robot</span>
+ <span class="k">├ arm</span>
+ <span class="k">│ ├</span> joint_position  <span class="sh">(7,)</span><span class="dt">float32</span><span class="md">rad</span>
+ <span class="k">│ ├</span> joint_velocity  <span class="sh">(7,)</span><span class="dt">float32</span><span class="md">rad/s</span>
+ <span class="k">│ ├</span> eef_position    <span class="sh">(3,)</span><span class="dt">float32</span><span class="md">m</span>
+ <span class="k">│ └</span> eef_quaternion  <span class="sh">(4,)</span><span class="dt">float32</span><span class="md">quat_wxyz</span>
+ <span class="k">└ gripper …</span>
+<span class="k">external_cam_0</span>
+ <span class="k">├</span> rgb               <span class="sh">(H,W,3)</span><span class="dt">uint8</span><span class="md">image · HWC</span>
+ <span class="k">├</span> depth             <span class="sh">(H,W)</span><span class="dt">float32</span><span class="md">depth · m</span>
+ <span class="k">└ …</span></pre>
+        <div class="schema-foot"><span class="ok">✓</span><span id="foot">Shared leaves keep the same keys, shapes and dtypes on every source.</span></div>
+      </div>
+    </div>
+    <svg class="wires" id="wires-out" aria-hidden="true"><path class="out"/><path class="out"/><path class="out"/><path class="out"/></svg>
+    <div>
+      <p class="col-title">Unchanged code</p>
+      <div class="sinks">
+        <div class="sink">Policy &amp; training<small>reads obs_space</small></div>
+        <div class="sink">Replay buffer<small>DictStorage by metadata</small></div>
+        <div class="sink">Remote serving<small>RemoteServer</small></div>
+        <div class="sink">Evaluation<small>same step() loop</small></div>
+      </div>
+    </div>
+  </div>
+  <p class="fig-note">A Franka FR3 with a Robotiq gripper: simulated with genesis_adaptor, driven live with DroidAdaptor, or replayed from the DROID dataset. Select a source.</p>
+</div>
+
+<section><div class="wrap meta">
+  <div>
+    <p class="eyebrow">Space metadata</p>
+    <h2>Spaces say what the data means, not just its shape.</h2>
+    <p class="sub">Every leaf can carry a small shared vocabulary: kind, units, frame, rotation, names, source, fps. Tools read it, so you stop passing per-key configuration around.</p>
+<pre class="codebox"><span class="f">BoxSpace</span>(backend, <span class="n">0</span>, <span class="n">255</span>, np.uint8, shape=(<span class="n">480</span>, <span class="n">640</span>, <span class="n">3</span>),
+         metadata={<span class="s">"kind"</span>: <span class="s">"image"</span>, <span class="s">"format"</span>: <span class="s">"rgb"</span>,
+                   <span class="s">"layout"</span>: <span class="s">"HWC"</span>, <span class="s">"source"</span>: <span class="s">"wrist_cam"</span>,
+                   <span class="s">"fps"</span>: <span class="n">15</span>})
+
+<span class="f">BoxSpace</span>(backend, -<span class="n">3.14</span>, <span class="n">3.14</span>, np.float32, shape=(<span class="n">7</span>,),
+         metadata={<span class="s">"kind"</span>: <span class="s">"proprio"</span>, <span class="s">"units"</span>: <span class="s">"rad"</span>,
+                   <span class="s">"names"</span>: [<span class="s">"fr3_joint1"</span>, ...]})</pre>
+  </div>
+  <div class="uses">
+    <div class="use"><span class="when">storage</span><div><h3>Buffers lay themselves out</h3><p><code>dict_storage_kwargs_from_space</code> routes image leaves to image or video storage at the declared fps, and everything else to HDF5.</p></div></div>
+    <div class="use"><span class="when">recording</span><div><h3>Videos from any observation</h3><p>Recorders pick the image leaves and convert BGR, CHW or gray cameras to RGB from <code>format</code> and <code>layout</code>.</p></div></div>
+    <div class="use"><span class="when">remote</span><div><h3>Compressed cameras over the wire</h3><p><code>compress={"image": "jpeg:90"}</code> JPEG-encodes only the leaves whose kind is image; depth and proprio stay exact.</p></div></div>
+    <div class="use"><span class="when">sim ↔ real</span><div><h3>Parity you can check</h3><p>Compare two spaces leaf by leaf, units and frames included, before a policy crosses from sim to the robot.</p></div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="eyebrow">What's inside</p>
+  <h2>Four layers, each usable on its own.</h2>
+  <p class="sub">Use only the layer you need. They share the same space definitions, so they compose.</p>
+  <div class="pillars">
+    <div class="pillar">
+      <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg></div>
+      <h3>Spaces</h3>
+      <p>Typed, nested data contracts with metadata. Any space converts between NumPy, PyTorch and JAX, and between devices.</p>
+      <code>BoxSpace</code><code>DictSpace</code><code>space.to()</code>
+    </div>
+    <div class="pillar">
+      <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M8 8l3 7M16 8l-3 7"/></svg></div>
+      <h3>Environments &amp; worlds</h3>
+      <p>Stateful and functional envs, plus worlds assembled from reusable robot, sensor and scene nodes.</p>
+      <code>Env</code><code>FuncEnv</code><code>World</code><code>WorldNode</code>
+    </div>
+    <div class="pillar">
+      <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
+      <h3>Data</h3>
+      <p>Replay buffers on Parquet, HDF5, image and video storages, with samplers and LeRobot / Hugging Face adapters.</p>
+      <code>ReplayBuffer</code><code>TransformedBatch</code>
+    </div>
+    <div class="pillar">
+      <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="8" height="12" rx="2"/><rect x="14" y="8" width="8" height="12" rx="2"/><path d="M10 10h4M10 14h4"/></svg></div>
+      <h3>Remote</h3>
+      <p>Host any env, world or node over TCP, Unix sockets or WebSocket. Clients get proxies with the same interface.</p>
+      <code>RemoteServer</code><code>RemoteClient</code>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap split">
+  <div>
+    <p class="eyebrow">Quick start</p>
+    <h2>From a space to a running loop.</h2>
+    <ol class="steps">
+      <li><b>Describe your data</b>Build the observation and action spaces once.</li>
+      <li><b>Wrap the source</b>A simulator, robot or dataset adaptor exposes those spaces.</li>
+      <li><b>Write everything else once</b>Buffers, policies and remote serving read the spaces, not the source.</li>
+    </ol>
+  </div>
+  <div class="code">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-t="0">Spaces → buffer</button>
+      <button role="tab" aria-selected="false" data-t="1">Serve an env</button>
+      <button role="tab" aria-selected="false" data-t="2">Switch backend</button>
+    </div>
+<pre class="on"><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> unienv_interface.backends.numpy <span class="k">import</span> NumpyComputeBackend <span class="k">as</span> B
+<span class="k">from</span> unienv_interface.space.spaces <span class="k">import</span> BoxSpace, DictSpace
+<span class="k">from</span> unienv_data.replay_buffer <span class="k">import</span> ReplayBuffer
+<span class="k">from</span> unienv_data.storages.parquet <span class="k">import</span> ParquetStorage
+
+space = <span class="f">DictSpace</span>(B, {
+    <span class="s">"obs"</span>:    <span class="f">BoxSpace</span>(B, <span class="n">0.0</span>, <span class="n">1.0</span>, np.float32, shape=(<span class="n">4</span>,)),
+    <span class="s">"action"</span>: <span class="f">BoxSpace</span>(B, -<span class="n">1.0</span>, <span class="n">1.0</span>, np.float32, shape=(<span class="n">2</span>,)),
+})
+
+buffer = ReplayBuffer.<span class="f">create</span>(
+    ParquetStorage, space,
+    cache_path=<span class="s">"cache/demo"</span>, capacity=<span class="n">10_000</span>,
+)</pre>
+<pre><span class="k">from</span> unienv_interface.remote <span class="k">import</span> RemoteServer, RemoteClient
+
+<span class="c"># on the robot</span>
+<span class="k">with</span> <span class="f">RemoteServer</span>() <span class="k">as</span> server:
+    server.<span class="f">register</span>(<span class="s">"robot"</span>, <span class="f">make_env</span>())
+    server.<span class="f">serve</span>(<span class="s">"tcp://0.0.0.0:7000"</span>)
+
+<span class="c"># on the workstation: a proxy with the same Env interface</span>
+<span class="k">with</span> RemoteClient.<span class="f">connect</span>(<span class="s">"tcp://robot-pc:7000"</span>) <span class="k">as</span> client:
+    env = client.<span class="f">env</span>(<span class="s">"robot"</span>)
+    context, obs, info = env.<span class="f">reset</span>(seed=<span class="n">42</span>)</pre>
+<pre><span class="k">from</span> unienv_interface.backends.pytorch <span class="k">import</span> PyTorchComputeBackend
+
+<span class="c"># the same space, now producing torch tensors on the GPU</span>
+torch_space = space.<span class="f">to</span>(PyTorchComputeBackend, device=<span class="s">"cuda"</span>)
+rng, sample = torch_space.<span class="f">sample</span>(rng)</pre>
+  </div>
+</div></section>
+
+<section id="ecosystem"><div class="wrap">
+  <p class="eyebrow">Ecosystem</p>
+  <h2>Adaptors for the tools you already use.</h2>
+  <p class="sub">Every adaptor speaks UniEnv spaces, so it plugs into the same wrappers, buffers and remote layer.</p>
+  <div class="eco-group"><h3>Core libraries</h3><div class="cards">
+    <a class="card" href="https://unienvorg.github.io/UniEnv/"><div class="name">UniEnv <span class="docs">docs</span></div><p>Spaces, environments, worlds, data and remote APIs.</p></a>
+    <a class="card" href="https://unienvorg.github.io/XBArray/"><div class="name">XBArray <span class="docs">docs</span></div><p>The array layer underneath: one Array API across NumPy, PyTorch and JAX.</p></a>
+  </div></div>
+  <div class="eco-group"><h3>Simulation</h3><div class="cards">
+    <a class="card" href="https://github.com/UniEnvOrg/genesis_adaptor"><div class="name">genesis_adaptor</div><p>Node-based simulation framework for Genesis: robots, end effectors, scenes, reference policies.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/ManiskillAdaptor"><div class="name">ManiskillAdaptor</div><p>ManiSkill 3 environments as UniEnv envs.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/mjlab_adaptor"><div class="name">mjlab_adaptor</div><p>Environment adaptor for mjlab.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/MujocoPlaygroundAdaptor"><div class="name">MujocoPlaygroundAdaptor</div><p>Environment adaptor for MuJoCo Playground.</p></a>
+  </div></div>
+  <div class="eco-group"><h3>Robots, sensors &amp; data</h3><div class="cards">
+    <a class="card" href="https://github.com/UniEnvOrg/DroidAdaptor"><div class="name">DroidAdaptor</div><p>DROID robot env and the DROID dataset in one schema.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/unienv-tianji"><div class="name">unienv-tianji</div><p>Tianji bimanual arms.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/unienv-wuji"><div class="name">unienv-wuji</div><p>Wuji dexterous hands.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/oymotion_rohand_adaptor"><div class="name">oymotion_rohand_adaptor</div><p>OyMotion ROHand world node.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/zed_camera_adaptor"><div class="name">zed_camera_adaptor</div><p>ZED stereo camera node.</p></a>
+    <a class="card" href="https://github.com/UniEnvOrg/unienv-input-devices"><div class="name">unienv-input-devices</div><p>Teleoperation input devices.</p></a>
+  </div></div>
+</div></section>
+
+<section id="cite"><div class="wrap cite">
+  <div>
+    <p class="eyebrow">Cite</p>
+    <h2>Using UniEnv in research?</h2>
+    <p class="sub">Please cite the software. XBArray is developed as part of UniEnv and shares this citation.</p>
+  </div>
+  <div class="bib"><button onclick="navigator.clipboard&&navigator.clipboard.writeText(this.parentNode.innerText.replace(/^Copy\n/,''));this.textContent='Copied'">Copy</button>@software{cao2025unienv,
+  title  = {UniEnv: Unifying Robot Environments and Data APIs},
+  author = {Cao, Yunhao and Fan, Cory and Zhang, Meryl and
+            Liu, Sabrina and Fang, Kuan and {UniEnv Contributors}},
+  year   = {2025},
+  url    = {https://github.com/UniEnvOrg/UniEnv}
+}</div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <a class="brand" href="#" style="font-size:16px"><img src="img/logo.svg" alt="" style="width:22px;height:22px">UniEnv</a>
+  <a href="https://unienvorg.github.io/UniEnv/">Docs</a>
+  <a href="https://github.com/UniEnvOrg">GitHub</a>
+  <a href="https://pypi.org/project/unienv/">PyPI</a>
+  <span class="sp">Apache-2.0 · © 2025–2026 UniEnv Contributors</span>
+</div></footer>
+
+<script>
+// latest release from PyPI (the static text stays if the request fails)
+fetch('https://pypi.org/pypi/unienv/json').then(r=>r.json())
+  .then(j=>{document.getElementById('ver').textContent='v'+j.info.version;}).catch(()=>{});
+
+// quick-start tabs
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  const t=+b.dataset.t, box=b.closest('.code');
+  box.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  box.querySelectorAll('pre').forEach((p,i)=>p.classList.toggle('on',i===t));
+}));
+
+// hero: select a source; the space stays the same, only how leaves arrive changes
+(function(){
+  const S=[
+    {badge:'torch · cuda:0 · batch 8', batch:true,
+     foot:'Batched sim: every leaf and its space gain a leading dim of 8.'},
+    {badge:'numpy · cpu', batch:false,
+     foot:'Shared leaves keep the same keys, shapes and dtypes as in sim.'},
+    {badge:'numpy · per recorded step', batch:false,
+     foot:'Recorded steps are converted with the robot env\'s own code.'}
+  ];
+  const srcs=[...document.querySelectorAll('.src')];
+  const wires=[...document.querySelectorAll('#wires-in path')];
+  const shapes=[...document.querySelectorAll('#tree .sh')].map(e=>({e,base:e.textContent}));
+  const badge=document.getElementById('badge'), foot=document.getElementById('foot');
+  let cur=-1, auto=true;
+  function pick(i){
+    if(i===cur) return; cur=i;
+    srcs.forEach((s,j)=>s.classList.toggle('on',j===i));
+    wires.forEach((w,j)=>w.classList.toggle('on',j===i));
+    badge.textContent=S[i].badge; foot.textContent=S[i].foot;
+    shapes.forEach(({e,base})=>{
+      e.textContent=S[i].batch? base.replace('(','(8,').replace(',)',')') : base;
+      e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash');
+    });
+  }
+  function curve(svg, from, to){
+    const r=svg.getBoundingClientRect(), w=r.width;
+    svg.setAttribute('viewBox',`0 0 ${w} ${r.height}`);
+    const mid=e=>{const b=e.getBoundingClientRect();return b.top+b.height/2-r.top;};
+    return {w, mid};
+  }
+  function layout(){
+    if(getComputedStyle(document.getElementById('wires-in')).display==='none') return;
+    const schema=document.querySelector('.schema');
+    const win=document.getElementById('wires-in'), {w:wi, mid:mi}=curve(win);
+    const ty=mi(schema);
+    win.querySelectorAll('path').forEach((p,j)=>{const y=mi(srcs[j]);p.setAttribute('d',`M0 ${y} C${wi*.55} ${y},${wi*.45} ${ty},${wi} ${ty}`);});
+    const wout=document.getElementById('wires-out'), {w:wo, mid:mo}=curve(wout);
+    const sy=mo(schema), sinks=[...document.querySelectorAll('.sink')];
+    wout.querySelectorAll('path').forEach((p,j)=>{const y=mo(sinks[j]);p.setAttribute('d',`M0 ${sy} C${wo*.5} ${sy},${wo*.5} ${y},${wo} ${y}`);});
+  }
+  addEventListener('resize',layout); addEventListener('load',layout);
+  if(document.fonts) document.fonts.ready.then(layout);
+  layout();
+  srcs.forEach((s,i)=>s.addEventListener('click',()=>{auto=false;pick(i);}));
+  pick(0);
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)
+    setInterval(()=>{ if(auto) pick((cur+1)%S.length); },3800);
+})();
+</script>
+</body>
+</html>

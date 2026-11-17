@@ -1,0 +1,23 @@
+{#- UniEnv shared docs theme: Material for MkDocs custom_dir.
+    A cross-project bar above Material's header. A project sets only
+    `extra.unienv.current` (its name in the bar); the project list lives here. -#}
+{% extends "base.html" %}
+
+{% block header %}
+  {% set ue = config.extra.unienv or {} %}
+  {% set projects = ue.projects or [
+      {"name": "UniEnv", "url": "https://unienvorg.github.io/UniEnv/"},
+      {"name": "XBArray", "url": "https://unienvorg.github.io/XBArray/"},
+      {"name": "Ecosystem", "url": "https://unienvorg.github.io/#ecosystem"},
+      {"name": "GitHub", "url": "https://github.com/UniEnvOrg"},
+  ] %}
+  <nav class="ue-orgbar" aria-label="UniEnv projects">
+    <a class="ue-orgbar__home" href="{{ ue.home or 'https://unienvorg.github.io/' }}">UniEnv project</a>
+    <span class="ue-orgbar__links">
+      {% for p in projects %}
+        <a href="{{ p.url }}"{% if p.name == ue.current %} aria-current="page"{% endif %}>{{ p.name }}</a>
+      {% endfor %}
+    </span>
+  </nav>
+  {{ super() }}
+{% endblock %}
