@@ -16,6 +16,15 @@ Edit `site/index.html` and push to `main`; `.github/workflows/pages.yml` deploys
 The release chip reads the latest `unienv` version from PyPI in the browser.
 Preview locally with any static server, e.g. `python -m http.server -d site`.
 
+### Authors and citation
+
+This site is the only place UniEnv's citation lives; the repos link to
+<https://unienvorg.github.io/#cite>. To add or change an author, edit the
+`<script type="application/json" id="citation">` block near the end of `site/index.html`.
+It renders both the author line under the title and the BibTeX in the Cite section.
+Each author is `{"given": ..., "family": ...}`, with an optional `"url"` that links the name.
+Keep `"key": "cao_unienv"` so existing citations stay valid.
+
 ## Docs theme
 
 `docs-theme/` holds:
