@@ -419,7 +419,7 @@ env = WorldEnv(world, [
     <div class="pillar">
       <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="8" height="12" rx="2"/><rect x="14" y="8" width="8" height="12" rx="2"/><path d="M10 10h4M10 14h4"/></svg></div>
       <h3>Remote</h3>
-      <p>Host any env, world or node over TCP, Unix sockets or WebSocket. Clients get proxies with the same interface.</p>
+      <p>Host any env, world, node or policy over TCP, Unix sockets or WebSocket. Clients get proxies with the same interface.</p>
       <code>RemoteServer</code><code>RemoteClient</code>
     </div>
   </div>
@@ -460,7 +460,7 @@ buffer = ReplayBuffer.<span class="f">create</span>(
 <pre><span class="k">import</span> numpy <span class="k">as</span> np
 <span class="k">from</span> unienv_interface.backends.numpy <span class="k">import</span> NumpyComputeBackend <span class="k">as</span> B
 <span class="k">from</span> unienv_interface.space <span class="k">import</span> BoxSpace
-<span class="k">from</span> unienv_policy <span class="k">import</span> Policy
+<span class="k">from</span> unienv_interface.policy <span class="k">import</span> Policy
 
 <span class="k">class</span> <span class="f">RandomPolicy</span>(Policy):
     <span class="c"># the policy declares what it reads and what it outputs</span>
@@ -473,12 +473,12 @@ buffer = ReplayBuffer.<span class="f">create</span>(
 
     <span class="c"># state comes from reset / observe_transition; a random policy keeps none</span>
     <span class="k">def</span> <span class="f">reset</span>(self, context, observation, **kwargs): <span class="k">pass</span>
-    <span class="k">def</span> <span class="f">observe_transition</span>(self, action, observation): <span class="k">pass</span>
+    <span class="k">def</span> <span class="f">observe_transition</span>(self, action_taken, new_observation): <span class="k">pass</span>
 
     <span class="k">def</span> <span class="f">get_action</span>(self, **kwargs):
         <span class="k">return</span> self.<span class="f">sample_action</span>()
 
-policy = <span class="f">RandomPolicy</span>()
+policy = <span class="f">RandomPolicy</span>()  <span class="c"># or one served remotely: client.policy("pi")</span>
 context, obs, info = env.<span class="f">reset</span>(seed=<span class="n">0</span>)
 policy.<span class="f">reset</span>(context, obs)
 <span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(<span class="n">100</span>):
@@ -622,8 +622,8 @@ rng, sample = torch_space.<span class="f">sample</span>(rng)</pre>
   "url": "https://github.com/UniEnvOrg/UniEnv",
   "license": "Apache-2.0",
   "authors": [
-    {"given": "Yunhao", "family": "Cao"},
-    {"given": "Pranav", "family": "Thakkar"},
+    {"given": "Yunhao", "family": "Cao", "url": "https://www.quantumcookie.xyz/"},
+    {"given": "Pranav", "family": "Thakkar", "url": "https://pranavnnt.github.io/"},
     {"given": "Cory", "family": "Fan"},
     {"given": "Meryl", "family": "Zhang"},
     {"given": "Sabrina", "family": "Liu"},
