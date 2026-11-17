@@ -52,14 +52,20 @@ h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;back
 .authors a:hover{color:var(--blue)}
 .authors .more{color:var(--muted)}
 .lede{font-size:19px;color:var(--muted);max-width:680px;margin:0 auto}
-.cta{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:30px;flex-wrap:wrap}
+.install{display:flex;justify-content:center;margin-top:28px}
+.cta{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-weight:500;font-size:15px;border:1px solid var(--blue-ink)}
 .btn.primary{background:var(--blue-ink);color:#fff}
 .btn.ghost{color:var(--blue-ink);background:transparent}
 .btn:hover{text-decoration:none;transform:translateY(-1px)}
-.pip{display:inline-flex;align-items:center;gap:10px;font:14px var(--mono);background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:9px 14px;color:var(--ink);cursor:pointer}
+.pip{display:inline-flex;align-items:center;gap:10px;font:14.5px var(--mono);background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:6px 6px 6px 16px;color:var(--ink)}
 .pip span{color:var(--muted)}
-.pip small{font:12px var(--sans);color:var(--muted)}
+.copy{all:unset;cursor:pointer;display:grid;place-items:center;width:30px;height:30px;border-radius:6px;color:var(--muted)}
+.copy:hover{background:#fff;color:var(--ink)}
+.copy:focus-visible{outline:2px solid var(--blue)}
+.copy .ok{display:none}
+.copy.done{color:var(--teal)}
+.copy.done .ok{display:block}.copy.done .cp{display:none}
 
 /* convergence figure */
 .converge{margin-top:56px;display:grid;grid-template-columns:318px 1fr 420px 1fr 200px;align-items:center;text-align:left}
@@ -154,7 +160,7 @@ h2{font-family:var(--serif);font-weight:600;font-size:36px;line-height:1.15;lett
 /* cite */
 .cite{display:grid;grid-template-columns:1fr 1.4fr;gap:40px;align-items:start}
 .bib{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;font:12.5px/1.6 var(--mono);white-space:pre;overflow:auto;color:#22364f}
-.bib button{position:absolute;top:10px;right:10px;font:500 12px var(--sans);border:1px solid var(--rule);background:#fff;border-radius:6px;padding:4px 10px;cursor:pointer}
+.bib .copy{position:absolute;top:10px;right:10px;background:#fff;border:1px solid var(--rule)}
 
 footer{border-top:1px solid var(--rule);padding:36px 0 48px;color:var(--muted);font-size:14px}
 footer .wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
@@ -192,10 +198,10 @@ footer .sp{margin-left:auto}
   <h1>One interface for robot <em>environments</em> and robot <em>data</em>.</h1>
   <p class="authors" id="authors"></p>
   <p class="lede">Simulators, real robots and datasets describe their data with the same spaces. Policies, buffers and tools written against those spaces work with every source.</p>
+  <div class="install"><div class="pip"><span>$</span>pip install unienv<button class="copy" data-copy="pip install unienv" aria-label="Copy the install command" title="Copy"><svg class="cp" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="ok" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div></div>
   <div class="cta">
     <a class="btn primary" href="https://unienvorg.github.io/UniEnv/latest/getting-started/">Get started →</a>
     <a class="btn ghost" href="https://github.com/UniEnvOrg/UniEnv">View on GitHub</a>
-    <button class="pip" onclick="navigator.clipboard&&navigator.clipboard.writeText('pip install unienv');this.querySelector('small').textContent='copied'"><span>$</span>pip install unienv <small>copy</small></button>
   </div>
 
   <div class="converge" id="converge">
@@ -339,20 +345,24 @@ buffer = ReplayBuffer.<span class="f">create</span>(
     ParquetStorage, space,
     cache_path=<span class="s">"cache/demo"</span>, capacity=<span class="n">10_000</span>,
 )</pre>
-<pre><span class="k">from</span> unienv_policy <span class="k">import</span> Policy
+<pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> unienv_interface.backends.numpy <span class="k">import</span> NumpyComputeBackend <span class="k">as</span> B
+<span class="k">from</span> unienv_interface.space <span class="k">import</span> BoxSpace
+<span class="k">from</span> unienv_policy <span class="k">import</span> Policy
 
 <span class="k">class</span> <span class="f">RandomPolicy</span>(Policy):
-    <span class="k">def</span> <span class="f">__init__</span>(self, env, seed=<span class="n">0</span>):
-        self.backend, self.device = env.backend, env.device
-        self.observation_space = env.observation_space
-        self.action_space = env.action_space
-        self.rng = env.backend.random.<span class="f">random_number_generator</span>(
-            seed, device=env.device)
+    <span class="c"># the policy declares what it reads and what it outputs</span>
+    backend, device = B, <span class="k">None</span>
+    observation_space = <span class="f">BoxSpace</span>(B, -np.pi, np.pi, np.float32, shape=(<span class="n">7</span>,))
+    action_space = <span class="f">BoxSpace</span>(B, -<span class="n">1.0</span>, <span class="n">1.0</span>, np.float32, shape=(<span class="n">7</span>,))
+
+    <span class="k">def</span> <span class="f">__init__</span>(self, seed=<span class="n">0</span>):
+        self.rng = B.random.<span class="f">random_number_generator</span>(seed)
 
     <span class="k">def</span> <span class="f">compute_action</span>(self, observation, **kwargs):
         <span class="k">return</span> self.<span class="f">sample_action</span>()
 
-policy = <span class="f">RandomPolicy</span>(env)
+policy = <span class="f">RandomPolicy</span>()
 context, obs, info = env.<span class="f">reset</span>(seed=<span class="n">0</span>)
 policy.<span class="f">reset</span>(context, obs)
 <span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(<span class="n">100</span>):
@@ -408,7 +418,7 @@ rng, sample = torch_space.<span class="f">sample</span>(rng)</pre>
     <h2>Using UniEnv in research?</h2>
     <p class="sub">Please cite the software. XBArray is developed as part of UniEnv and shares this citation.</p>
   </div>
-  <div class="bib"><button id="copy-bib">Copy</button><span id="bibtex"></span></div>
+  <div class="bib"><button class="copy" id="copy-bib" aria-label="Copy the BibTeX" title="Copy"><svg class="cp" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="ok" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><span id="bibtex"></span></div>
 </div></section>
 </main>
 
@@ -472,9 +482,14 @@ rng, sample = torch_space.<span class="f">sample</span>(rng)</pre>
     +(c.license?'  license = {'+c.license+'}\n':'')
     +'}';
   document.getElementById('bibtex').textContent=bib;
-  const btn=document.getElementById('copy-bib');
-  btn.addEventListener('click',()=>{navigator.clipboard&&navigator.clipboard.writeText(bib);btn.textContent='Copied';});
+  document.getElementById('copy-bib').dataset.copy=bib;
 })();
+
+// copy buttons: copy data-copy, show a check for 1.5 s
+document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
+  if(navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy||'');
+  b.classList.add('done'); setTimeout(()=>b.classList.remove('done'),1500);
+}));
 
 // latest release from PyPI (the static text stays if the request fails)
 fetch('https://pypi.org/pypi/unienv/json').then(r=>r.json())
