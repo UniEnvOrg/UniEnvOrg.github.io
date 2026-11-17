@@ -112,6 +112,7 @@ h2{font-family:var(--serif);font-weight:600;font-size:36px;line-height:1.15;lett
 
 /* metadata section */
 .meta{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.meta > *{min-width:0} /* the code box scrolls instead of widening the column on narrow screens */
 .uses{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:14px;background:#fff;overflow:hidden}
 .use{padding:18px 22px;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:92px 1fr;gap:16px}
 .use:last-child{border-bottom:0}
@@ -144,6 +145,90 @@ h2{font-family:var(--serif);font-weight:600;font-size:36px;line-height:1.15;lett
 .code pre.on{display:block}
 .k{color:#c792ea}.s{color:#b5e3a0}.f{color:#7fb6ff}.c{color:#7d8b97;font-style:italic}.n{color:#f2a97f}
 
+/* performance */
+.perf3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pcard{background:#fff;border:1px solid var(--rule);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pfig{background:var(--panel);border-bottom:1px solid var(--rule);padding:14px 10px 8px}
+.pfig svg{display:block;width:100%;height:auto}
+.pbody{padding:18px 22px 20px;display:flex;flex-direction:column;flex:1}
+.pbody h3{font-size:16.5px;font-weight:600;margin:0 0 6px}
+.pbody p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.55}
+.pbody code{font-size:12.5px;color:#22364f;overflow-wrap:anywhere}
+.pstat{margin-top:auto;padding-top:16px;display:flex;align-items:baseline;gap:10px}
+.pstat b{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1;letter-spacing:-.02em;color:var(--blue-ink);white-space:nowrap}
+.pcard:nth-child(2) .pstat b{color:var(--teal)}
+.pstat span{color:var(--muted);font-size:13px;line-height:1.4}
+.perf-note{margin:16px 2px 0;color:var(--muted);font-size:13px}
+.perf-note code{font-size:12px}
+/* metadata section: two cards with figures */
+.mcards{display:flex;flex-direction:column;gap:16px}
+.mcard{display:grid;grid-template-columns:1fr;background:#fff;border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+.mcard .pfig{padding:14px 12px 8px}
+.mcard .pfig svg{max-width:420px;margin:0 auto}
+.mcard .pbody{padding:16px 22px 18px}
+/* figure parts */
+.pfig text{font:500 10.5px var(--mono);fill:var(--muted)}
+.pfig .lbl{fill:var(--ink)}
+.pfig .box{fill:#fff;stroke:#cfd6d4;stroke-width:1.2}
+.pfig .cell{fill:var(--blue-soft);stroke:var(--blue);stroke-width:1}
+.pfig .link{fill:none;stroke:#cfd6d4;stroke-width:1.5}
+.pfig .track{fill:#e4e8e6}
+/* 1: one buffer, three frameworks */
+.dl .tag{animation:dl-tag 3.6s infinite}
+.dl .link{stroke-dasharray:5 5;animation:dl-link 3.6s infinite, flow 1s linear infinite}
+.dl .t2{animation-delay:1.2s}.dl .t3{animation-delay:2.4s}
+.dl .link.t2{animation-delay:1.2s,0s}.dl .link.t3{animation-delay:2.4s,0s}
+.dl .cell{animation:dl-cell 1.2s infinite}
+@keyframes dl-tag{0%,33%{fill:var(--blue-soft);stroke:var(--blue)}34%,100%{fill:#fff;stroke:#cfd6d4}}
+@keyframes dl-link{0%,33%{stroke:var(--blue)}34%,100%{stroke:#cfd6d4}}
+@keyframes dl-cell{0%,100%{fill:var(--blue-soft)}50%{fill:#d4e4f1}}
+/* 2: workers fill rows of one shared buffer, the parent reads it in place */
+.vec .row{fill:var(--teal-bright);transform-box:fill-box;transform-origin:left center;animation:vec-fill 3.2s infinite backwards}
+.vec .r1{animation-delay:.15s}.vec .r2{animation-delay:.3s}.vec .r3{animation-delay:.45s}
+.vec .wk{animation:vec-wk 3.2s infinite backwards}
+.vec .w1{animation-delay:.15s}.vec .w2{animation-delay:.3s}.vec .w3{animation-delay:.45s}
+.vec .parent{animation:vec-parent 3.2s infinite}
+.vec .read{stroke:var(--teal);stroke-width:1.5;fill:none;stroke-dasharray:4 4;animation:vec-read 3.2s infinite, flow 1s linear infinite}
+@keyframes vec-fill{0%{transform:scaleX(0);opacity:1}18%{transform:scaleX(1);opacity:1}82%{transform:scaleX(1);opacity:1}96%,100%{transform:scaleX(1);opacity:0}}
+@keyframes vec-wk{0%,18%{stroke:var(--teal);fill:var(--teal-soft)}19%,100%{stroke:#cfd6d4;fill:#fff}}
+@keyframes vec-parent{0%,30%{stroke:#cfd6d4;fill:#fff}38%,80%{stroke:var(--blue);fill:var(--blue-soft)}88%,100%{stroke:#cfd6d4;fill:#fff}}
+@keyframes vec-read{0%,30%{opacity:0}38%,80%{opacity:1}88%,100%{opacity:0}}
+/* 3: the same dump, before and now */
+.race .bar{transform-box:fill-box;transform-origin:left center}
+.race .old{fill:#b9c2c8;animation:race-old 5s linear infinite}
+.race .new{fill:var(--teal-bright);animation:race-new 5s linear infinite}
+.race .done-old{animation:race-done-old 5s linear infinite}
+.race .done-new{animation:race-done-new 5s linear infinite}
+@keyframes race-old{0%{transform:scaleX(0)}80%,100%{transform:scaleX(1)}}
+@keyframes race-new{0%{transform:scaleX(0)}4%,100%{transform:scaleX(1)}}
+@keyframes race-done-old{0%,79%{opacity:0}80%,100%{opacity:1}}
+@keyframes race-done-new{0%,3%{opacity:0}4%,100%{opacity:1}}
+/* 4: leaves routed to storages by their kind */
+.route .link{stroke-dasharray:5 5;animation:flow 1s linear infinite}
+.route .pkt{fill:var(--teal-bright)}
+.route .pkt.img{fill:var(--blue)}
+.route .dst{animation:route-dst 3s infinite backwards}
+.route .d2{animation-delay:1s}
+@keyframes route-dst{0%,8%{stroke:#cfd6d4;fill:#fff}14%,40%{stroke:var(--teal);fill:var(--teal-soft)}50%,100%{stroke:#cfd6d4;fill:#fff}}
+.route .dst.img{animation-name:route-dst-img}
+@keyframes route-dst-img{0%,8%{stroke:#cfd6d4;fill:#fff}14%,40%{stroke:var(--blue);fill:var(--blue-soft)}50%,100%{stroke:#cfd6d4;fill:#fff}}
+/* 5: sim and real compared leaf by leaf */
+.parity .scan{fill:var(--blue-soft);transform-box:view-box;animation:parity-scan 4.8s infinite steps(1,end)}
+@keyframes parity-scan{0%{transform:translateY(0)}20%{transform:translateY(24px)}40%{transform:translateY(48px)}60%{transform:translateY(72px)}80%,100%{transform:translateY(-200px)}}
+.parity .mark{opacity:0;animation:parity-mark 4.8s infinite backwards}
+.parity .m1{animation-delay:.96s}.parity .m2{animation-delay:1.92s}.parity .m3{animation-delay:2.88s}
+@keyframes parity-mark{0%,15%{opacity:0}20%,96%{opacity:1}100%{opacity:0}}
+.parity .ok{font:600 13px var(--sans);fill:var(--teal)}
+.parity .bad{font:600 13px var(--sans);fill:#b5651d}
+.parity .badrow{fill:#fbeee0;opacity:0;animation:parity-mark 4.8s infinite backwards;animation-delay:2.88s}
+.parity .verdict{opacity:0;animation:parity-verdict 4.8s infinite}
+@keyframes parity-verdict{0%,79%{opacity:0}80%,96%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .route .pkt{display:none}
+  .parity .scan{display:none}.parity .mark,.parity .badrow,.parity .verdict{opacity:1}
+  .vec .row{transform:none}.race .bar{transform:none}
+}
+
 /* ecosystem */
 .eco-group{margin-bottom:30px}
 .eco-group h3{font:500 12.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
@@ -175,8 +260,9 @@ footer .sp{margin-left:auto}
 @media (max-width:900px){
   nav.top a:not(.gh){display:none}
   .pillars{grid-template-columns:1fr 1fr}.pillar:last-child{grid-column:1/-1}
-  .split,.cite,.meta{grid-template-columns:1fr}
+  .split,.cite,.meta,.perf3{grid-template-columns:1fr}
 }
+
 </style>
 </head>
 <body>
@@ -186,6 +272,7 @@ footer .sp{margin-left:auto}
   <nav class="top">
     <a href="https://unienvorg.github.io/UniEnv/">Docs</a>
     <a href="https://unienvorg.github.io/XBArray/">XBArray</a>
+    <a href="#performance">Performance</a>
     <a href="#ecosystem">Ecosystem</a>
     <a href="#cite">Cite</a>
     <a class="gh" href="https://github.com/UniEnvOrg/UniEnv">GitHub ↗</a>
@@ -243,7 +330,7 @@ env = WorldEnv(world, [
     <div>
       <p class="col-title">Unchanged code</p>
       <div class="sinks">
-        <div class="sink">Policies<small>Policy.compute_action</small></div>
+        <div class="sink">Policies<small>Policy.get_action</small></div>
         <div class="sink">Replay buffer<small>DictStorage by metadata</small></div>
         <div class="sink">Remote serving<small>RemoteServer</small></div>
         <div class="sink">Evaluation<small>same step() loop</small></div>
@@ -267,11 +354,36 @@ env = WorldEnv(world, [
          metadata={<span class="s">"kind"</span>: <span class="s">"proprio"</span>, <span class="s">"units"</span>: <span class="s">"rad"</span>,
                    <span class="s">"names"</span>: [<span class="s">"fr3_joint1"</span>, ...]})</pre>
   </div>
-  <div class="uses">
-    <div class="use"><span class="when">storage</span><div><h3>Buffers lay themselves out</h3><p><code>dict_storage_kwargs_from_space</code> routes image leaves to image or video storage at the declared fps, and everything else to HDF5.</p></div></div>
-    <div class="use"><span class="when">recording</span><div><h3>Videos from any observation</h3><p>Recorders pick the image leaves and convert BGR, CHW or gray cameras to RGB from <code>format</code> and <code>layout</code>.</p></div></div>
-    <div class="use"><span class="when">remote</span><div><h3>Compressed cameras over the wire</h3><p><code>compress={"image": "jpeg:90"}</code> JPEG-encodes only the leaves whose kind is image; depth and proprio stay exact.</p></div></div>
-    <div class="use"><span class="when">sim ↔ real</span><div><h3>Parity you can check</h3><p>Compare two spaces leaf by leaf, units and frames included, before a policy crosses from sim to the robot.</p></div></div>
+  <div class="mcards">
+    <div class="mcard">
+      <div class="pfig"><svg class="route" viewBox="0 0 340 140" role="img" aria-label="Leaves are routed to storages by their metadata: the image leaf to image or video storage, depth and proprioception to HDF5">
+        <rect class="box" x="8" y="12" width="134" height="28" rx="6"/><text class="lbl" x="18" y="30">rgb</text><text x="132" y="30" text-anchor="end" style="fill:var(--blue)">image</text>
+        <rect class="box" x="8" y="56" width="134" height="28" rx="6"/><text class="lbl" x="18" y="74">depth</text><text x="132" y="74" text-anchor="end" style="fill:var(--teal)">depth</text>
+        <rect class="box" x="8" y="100" width="134" height="28" rx="6"/><text class="lbl" x="18" y="118">joint_pos</text><text x="132" y="118" text-anchor="end" style="fill:var(--teal)">proprio</text>
+        <path id="rt-a" class="link" d="M142 26 C182 26 182 32 214 32"/>
+        <path id="rt-b" class="link" d="M142 70 C182 70 182 96 214 96"/>
+        <path id="rt-c" class="link" d="M142 114 C182 114 182 104 214 104"/>
+        <rect class="box dst img" x="214" y="12" width="118" height="42" rx="6"/><text class="lbl" x="273" y="30" text-anchor="middle">images</text><text x="273" y="45" text-anchor="middle">JPEG or video</text>
+        <rect class="box dst d2" x="214" y="78" width="118" height="44" rx="6"/><text class="lbl" x="273" y="97" text-anchor="middle">HDF5</text><text x="273" y="112" text-anchor="middle">everything else</text>
+        <circle class="pkt img" r="4" opacity="0"><animateMotion dur="3s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.12;1" calcMode="linear"><mpath href="#rt-a"/></animateMotion><animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.12;0.16;1"/></circle>
+        <circle class="pkt" r="4" opacity="0"><animateMotion dur="3s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.33;0.45;1" calcMode="linear"><mpath href="#rt-b"/></animateMotion><animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.32;0.33;0.45;0.49;1"/></circle>
+        <circle class="pkt" r="4" opacity="0"><animateMotion dur="3s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.33;0.45;1" calcMode="linear"><mpath href="#rt-c"/></animateMotion><animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.32;0.33;0.45;0.49;1"/></circle>
+      </svg></div>
+      <div class="pbody"><h3>Buffers lay themselves out</h3><p><code>dict_storage_kwargs_from_space</code> routes image leaves to image or video storage at the declared fps, and everything else to HDF5.</p></div>
+    </div>
+    <div class="mcard">
+      <div class="pfig"><svg class="parity" viewBox="0 0 340 140" role="img" aria-label="A simulated and a real observation space compared leaf by leaf: positions and orientation match, joint velocity units differ">
+        <text x="172" y="14" text-anchor="middle">sim</text><text x="262" y="14" text-anchor="middle">real</text>
+        <rect class="badrow" x="4" y="92" width="332" height="22" rx="4"/>
+        <rect class="scan" x="4" y="20" width="332" height="22" rx="4"/>
+        <text class="lbl" x="12" y="35">joint_pos</text><text x="172" y="35" text-anchor="middle">rad</text><text x="262" y="35" text-anchor="middle">rad</text><text class="mark ok" x="322" y="36" text-anchor="middle">&#10003;</text>
+        <text class="lbl" x="12" y="59">eef_pos</text><text x="172" y="59" text-anchor="middle">m · base</text><text x="262" y="59" text-anchor="middle">m · base</text><text class="mark ok m1" x="322" y="60" text-anchor="middle">&#10003;</text>
+        <text class="lbl" x="12" y="83">eef_quat</text><text x="172" y="83" text-anchor="middle">quat_wxyz</text><text x="262" y="83" text-anchor="middle">quat_wxyz</text><text class="mark ok m2" x="322" y="84" text-anchor="middle">&#10003;</text>
+        <text class="lbl" x="12" y="107">joint_vel</text><text x="172" y="107" text-anchor="middle">rad/s</text><text x="262" y="107" text-anchor="middle" style="fill:#b5651d">deg/s</text><text class="mark bad m3" x="322" y="108" text-anchor="middle">&#10007;</text>
+        <text class="verdict" x="170" y="134" text-anchor="middle">spaces_equal_with_metadata(sim, real) &rarr; False</text>
+      </svg></div>
+      <div class="pbody"><h3>Parity you can check</h3><p>Compare two spaces leaf by leaf, units and frames included, before a policy crosses from sim to the robot.</p></div>
+    </div>
   </div>
 </div></section>
 
@@ -359,14 +471,18 @@ buffer = ReplayBuffer.<span class="f">create</span>(
     <span class="k">def</span> <span class="f">__init__</span>(self, seed=<span class="n">0</span>):
         self.rng = B.random.<span class="f">random_number_generator</span>(seed)
 
-    <span class="k">def</span> <span class="f">compute_action</span>(self, observation, **kwargs):
+    <span class="c"># state comes from reset / observe_transition; a random policy keeps none</span>
+    <span class="k">def</span> <span class="f">reset</span>(self, context, observation, **kwargs): <span class="k">pass</span>
+    <span class="k">def</span> <span class="f">observe_transition</span>(self, action, observation): <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="f">get_action</span>(self, **kwargs):
         <span class="k">return</span> self.<span class="f">sample_action</span>()
 
 policy = <span class="f">RandomPolicy</span>()
 context, obs, info = env.<span class="f">reset</span>(seed=<span class="n">0</span>)
 policy.<span class="f">reset</span>(context, obs)
 <span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(<span class="n">100</span>):
-    action = policy.<span class="f">compute_action</span>(obs)
+    action = policy.<span class="f">get_action</span>()
     obs, reward, terminated, truncated, info = env.<span class="f">step</span>(action)
     policy.<span class="f">observe_transition</span>(action, obs)</pre>
 <pre><span class="k">from</span> unienv_interface.remote <span class="k">import</span> RemoteServer, RemoteClient
@@ -386,6 +502,71 @@ policy.<span class="f">reset</span>(context, obs)
 torch_space = space.<span class="f">to</span>(PyTorchComputeBackend, device=<span class="s">"cuda"</span>)
 rng, sample = torch_space.<span class="f">sample</span>(rng)</pre>
   </div>
+</div></section>
+
+<section id="performance"><div class="wrap">
+  <p class="eyebrow">Performance</p>
+  <h2>Zero-copy where data moves, tuned where it is stored.</h2>
+  <p class="sub">Tensors cross frameworks and processes without being copied, and the storages are benchmarked on robot-sized data: camera frames, proprioception, long episodes.</p>
+  <div class="perf3">
+    <div class="pcard">
+      <div class="pfig"><svg class="dl" viewBox="0 0 300 150" role="img" aria-label="NumPy, PyTorch and JAX in turn point at the same memory buffer">
+        <rect class="box tag t1" x="18" y="10" width="76" height="26" rx="6"/><text class="lbl" x="56" y="27" text-anchor="middle">NumPy</text>
+        <rect class="box tag t2" x="112" y="10" width="76" height="26" rx="6"/><text class="lbl" x="150" y="27" text-anchor="middle">PyTorch</text>
+        <rect class="box tag t3" x="206" y="10" width="76" height="26" rx="6"/><text class="lbl" x="244" y="27" text-anchor="middle">JAX</text>
+        <path class="link t1" d="M56 36 C56 66 150 60 150 88"/>
+        <path class="link t2" d="M150 36 L150 88"/>
+        <path class="link t3" d="M244 36 C244 66 150 60 150 88"/>
+        <g><rect class="cell" x="60" y="90" width="18" height="22" rx="2"/><rect class="cell" x="78" y="90" width="18" height="22" rx="2" style="animation-delay:.1s"/><rect class="cell" x="96" y="90" width="18" height="22" rx="2" style="animation-delay:.2s"/><rect class="cell" x="114" y="90" width="18" height="22" rx="2" style="animation-delay:.3s"/><rect class="cell" x="132" y="90" width="18" height="22" rx="2" style="animation-delay:.4s"/><rect class="cell" x="150" y="90" width="18" height="22" rx="2" style="animation-delay:.5s"/><rect class="cell" x="168" y="90" width="18" height="22" rx="2" style="animation-delay:.6s"/><rect class="cell" x="186" y="90" width="18" height="22" rx="2" style="animation-delay:.7s"/><rect class="cell" x="204" y="90" width="18" height="22" rx="2" style="animation-delay:.8s"/><rect class="cell" x="222" y="90" width="18" height="22" rx="2" style="animation-delay:.9s"/></g>
+        <text x="150" y="134" text-anchor="middle">one buffer · same pointer</text>
+      </svg></div>
+      <div class="pbody">
+        <h3>Zero-copy across backends</h3>
+        <p><code>space.data_to(x, backend=...)</code> hands arrays between frameworks through DLPack: the result is a view of the same memory.</p>
+        <div class="pstat"><b>0 copies</b><span>NumPy &harr; PyTorch on the CPU, PyTorch &harr; JAX on the GPU</span></div>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="pfig"><svg class="vec" viewBox="0 0 300 150" role="img" aria-label="Four environment workers write their rows of one shared buffer, which the parent reads in place">
+        <rect class="box wk" x="10" y="14" width="54" height="22" rx="5"/><text x="37" y="29" text-anchor="middle">env 0</text>
+        <rect class="box wk w1" x="10" y="44" width="54" height="22" rx="5"/><text x="37" y="59" text-anchor="middle">env 1</text>
+        <rect class="box wk w2" x="10" y="74" width="54" height="22" rx="5"/><text x="37" y="89" text-anchor="middle">env 2</text>
+        <rect class="box wk w3" x="10" y="104" width="54" height="22" rx="5"/><text x="37" y="119" text-anchor="middle">env 3</text>
+        <path class="link" d="M64 25 H100 M64 55 H100 M64 85 H100 M64 115 H100"/>
+        <rect class="box" x="100" y="12" width="100" height="116" rx="6"/>
+        <rect class="track" x="106" y="18" width="88" height="20" rx="3"/><rect class="row" x="106" y="18" width="88" height="20" rx="3"/>
+        <rect class="track" x="106" y="46" width="88" height="20" rx="3"/><rect class="row r1" x="106" y="46" width="88" height="20" rx="3"/>
+        <rect class="track" x="106" y="74" width="88" height="20" rx="3"/><rect class="row r2" x="106" y="74" width="88" height="20" rx="3"/>
+        <rect class="track" x="106" y="102" width="88" height="20" rx="3"/><rect class="row r3" x="106" y="102" width="88" height="20" rx="3"/>
+        <text x="150" y="144" text-anchor="middle">shared memory</text>
+        <path class="read" d="M200 70 H232"/>
+        <rect class="box parent" x="232" y="44" width="58" height="52" rx="6"/><text class="lbl" x="261" y="67" text-anchor="middle">parent</text><text x="261" y="82" text-anchor="middle">view</text>
+      </svg></div>
+      <div class="pbody">
+        <h3>Shared-memory vectorized envs</h3>
+        <p><code>AsyncVecEnv</code> workers write observations into one shared buffer that the parent reads in place; CUDA envs share GPU memory over CUDA IPC.</p>
+        <div class="pstat"><b>20&ndash;35&times;</b><span>more steps/s than through pipes (PyTorch CPU, 8 workers)</span></div>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="pfig"><svg class="race" viewBox="0 0 300 150" role="img" aria-label="Dumping the same 10k frames: the previous Parquet encoding takes 9.5 s, the binary encoding 0.46 s">
+        <text x="12" y="20">dump 10k 128&times;128 frames</text>
+        <text class="lbl" x="12" y="54">before</text>
+        <rect class="track" x="70" y="42" width="180" height="16" rx="4"/><rect class="bar old" x="70" y="42" width="180" height="16" rx="4"/>
+        <text class="done-old" x="258" y="54">9.5 s</text>
+        <text class="lbl" x="12" y="100">now</text>
+        <rect class="track" x="70" y="88" width="180" height="16" rx="4"/><rect class="bar new" x="70" y="88" width="180" height="16" rx="4"/>
+        <text class="done-new" x="258" y="100" style="fill:var(--teal)">0.46 s</text>
+        <text x="12" y="138">HDF5 reads ~200&times; · LeRobot reads ~100&times;</text>
+      </svg></div>
+      <div class="pbody">
+        <h3>Storage tuned on robot data</h3>
+        <p>HDF5, Parquet, video and LeRobot storages are profiled on camera frames and long episodes, and read only the rows and columns a batch needs.</p>
+        <div class="pstat"><b>~20&times;</b><span>faster Parquet dumps with <code>array_encoding="binary"</code></span></div>
+      </div>
+    </div>
+  </div>
+  <p class="perf-note">Speedups are against UniEnv's previous implementation of the same feature, measured on one workstation; absolute times depend on the machine. Reproduce them with the scripts in <a href="https://github.com/UniEnvOrg/UniEnv/tree/main/benchmarks"><code>benchmarks/</code></a>.</p>
 </div></section>
 
 <section id="ecosystem"><div class="wrap">
