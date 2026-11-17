@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UniEnv: one interface for robot environments and robot data</title>
-<meta name="description" content="UniEnv gives simulators, real robots and datasets one interface: typed spaces with metadata, composable worlds, backend-portable tensors, replay buffers and remote execution.">
+<meta name="description" content="UniEnv gives simulators, real robots and datasets one interface: typed spaces with metadata, composable worlds, policy interfaces, backend-portable tensors, replay buffers and remote execution.">
 <meta property="og:title" content="UniEnv">
 <meta property="og:description" content="One interface for robot environments and robot data.">
 <meta property="og:url" content="https://unienvorg.github.io/">
@@ -116,9 +116,8 @@ h2{font-family:var(--serif);font-weight:600;font-size:36px;line-height:1.15;lett
 .codebox{background:#14202b;color:#e3e8ec;border-radius:14px;padding:20px 22px;font:12.5px/1.65 var(--mono);white-space:pre;overflow:auto;margin:0}
 
 /* pillars */
-.pillars{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule);border-radius:14px;background:#fff;overflow:hidden}
-.pillar{padding:26px 24px;border-right:1px solid var(--rule)}
-.pillar:last-child{border-right:0}
+.pillars{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+.pillar{padding:24px 20px;background:#fff}
 .pillar .ico{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);margin-bottom:16px}
 .pillar:nth-child(even) .ico{background:var(--teal-soft);color:var(--teal)}
 .pillar h3{font-size:16.5px;margin:0 0 6px;font-weight:600}
@@ -169,7 +168,7 @@ footer .sp{margin-left:auto}
 }
 @media (max-width:900px){
   nav.top a:not(.gh){display:none}
-  .pillars{grid-template-columns:1fr 1fr}.pillar:nth-child(2){border-right:0}.pillar:nth-child(-n+2){border-bottom:1px solid var(--rule)}
+  .pillars{grid-template-columns:1fr 1fr}.pillar:last-child{grid-column:1/-1}
   .split,.cite,.meta{grid-template-columns:1fr}
 }
 </style>
@@ -238,7 +237,7 @@ env = WorldEnv(world, [
     <div>
       <p class="col-title">Unchanged code</p>
       <div class="sinks">
-        <div class="sink">Policy &amp; training<small>reads obs_space</small></div>
+        <div class="sink">Policies<small>Policy.compute_action</small></div>
         <div class="sink">Replay buffer<small>DictStorage by metadata</small></div>
         <div class="sink">Remote serving<small>RemoteServer</small></div>
         <div class="sink">Evaluation<small>same step() loop</small></div>
@@ -272,7 +271,7 @@ env = WorldEnv(world, [
 
 <section><div class="wrap">
   <p class="eyebrow">What's inside</p>
-  <h2>Four layers, each usable on its own.</h2>
+  <h2>Five layers, each usable on its own.</h2>
   <p class="sub">Use only the layer you need. They share the same space definitions, so they compose.</p>
   <div class="pillars">
     <div class="pillar">
@@ -286,6 +285,12 @@ env = WorldEnv(world, [
       <h3>Environments &amp; worlds</h3>
       <p>Stateful and functional envs, plus worlds assembled from reusable robot, sensor and scene nodes.</p>
       <code>Env</code><code>FuncEnv</code><code>World</code><code>WorldNode</code>
+    </div>
+    <div class="pillar">
+      <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></div>
+      <h3>Policies</h3>
+      <p>Stateful and functional policies that act against the env's spaces, with wrappers that stack like env wrappers.</p>
+      <code>Policy</code><code>FuncPolicy</code>
     </div>
     <div class="pillar">
       <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
@@ -309,14 +314,15 @@ env = WorldEnv(world, [
     <ol class="steps">
       <li><b>Describe your data</b>Build the observation and action spaces once.</li>
       <li><b>Wrap the source</b>A simulator, robot or dataset adaptor exposes those spaces.</li>
-      <li><b>Write everything else once</b>Buffers, policies and remote serving read the spaces, not the source.</li>
+      <li><b>Write everything else once</b>Policies, buffers and remote serving read the spaces, not the source.</li>
     </ol>
   </div>
   <div class="code">
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-t="0">Spaces → buffer</button>
-      <button role="tab" aria-selected="false" data-t="1">Serve an env</button>
-      <button role="tab" aria-selected="false" data-t="2">Switch backend</button>
+      <button role="tab" aria-selected="false" data-t="1">Run a policy</button>
+      <button role="tab" aria-selected="false" data-t="2">Serve an env</button>
+      <button role="tab" aria-selected="false" data-t="3">Switch backend</button>
     </div>
 <pre class="on"><span class="k">import</span> numpy <span class="k">as</span> np
 <span class="k">from</span> unienv_interface.backends.numpy <span class="k">import</span> NumpyComputeBackend <span class="k">as</span> B
@@ -333,6 +339,26 @@ buffer = ReplayBuffer.<span class="f">create</span>(
     ParquetStorage, space,
     cache_path=<span class="s">"cache/demo"</span>, capacity=<span class="n">10_000</span>,
 )</pre>
+<pre><span class="k">from</span> unienv_policy <span class="k">import</span> Policy
+
+<span class="k">class</span> <span class="f">RandomPolicy</span>(Policy):
+    <span class="k">def</span> <span class="f">__init__</span>(self, env, seed=<span class="n">0</span>):
+        self.backend, self.device = env.backend, env.device
+        self.observation_space = env.observation_space
+        self.action_space = env.action_space
+        self.rng = env.backend.random.<span class="f">random_number_generator</span>(
+            seed, device=env.device)
+
+    <span class="k">def</span> <span class="f">compute_action</span>(self, observation, **kwargs):
+        <span class="k">return</span> self.<span class="f">sample_action</span>()
+
+policy = <span class="f">RandomPolicy</span>(env)
+context, obs, info = env.<span class="f">reset</span>(seed=<span class="n">0</span>)
+policy.<span class="f">reset</span>(context, obs)
+<span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(<span class="n">100</span>):
+    action = policy.<span class="f">compute_action</span>(obs)
+    obs, reward, terminated, truncated, info = env.<span class="f">step</span>(action)
+    policy.<span class="f">observe_transition</span>(action, obs)</pre>
 <pre><span class="k">from</span> unienv_interface.remote <span class="k">import</span> RemoteServer, RemoteClient
 
 <span class="c"># on the robot</span>
@@ -357,7 +383,7 @@ rng, sample = torch_space.<span class="f">sample</span>(rng)</pre>
   <h2>Adaptors for the tools you already use.</h2>
   <p class="sub">Every adaptor speaks UniEnv spaces, so it plugs into the same wrappers, buffers and remote layer.</p>
   <div class="eco-group"><h3>Core libraries</h3><div class="cards">
-    <a class="card" href="https://unienvorg.github.io/UniEnv/"><div class="name">UniEnv <span class="docs">docs</span></div><p>Spaces, environments, worlds, data and remote APIs.</p></a>
+    <a class="card" href="https://unienvorg.github.io/UniEnv/"><div class="name">UniEnv <span class="docs">docs</span></div><p>Spaces, environments, worlds, policies, data and remote APIs.</p></a>
     <a class="card" href="https://unienvorg.github.io/XBArray/"><div class="name">XBArray <span class="docs">docs</span></div><p>The array layer underneath: one Array API across NumPy, PyTorch and JAX.</p></a>
   </div></div>
   <div class="eco-group"><h3>Simulation</h3><div class="cards">
@@ -391,7 +417,7 @@ rng, sample = torch_space.<span class="f">sample</span>(rng)</pre>
   <a href="https://unienvorg.github.io/UniEnv/">Docs</a>
   <a href="https://github.com/UniEnvOrg">GitHub</a>
   <a href="https://pypi.org/project/unienv/">PyPI</a>
-  <span class="sp">Apache-2.0 · © 2025–2026 UniEnv Contributors</span>
+  <span class="sp">Apache-2.0 · © 2025–2026 Yunhao Cao and UniEnv Contributors</span>
 </div></footer>
 
 <!-- Citation: the one place to edit authors. It drives the author line under the
