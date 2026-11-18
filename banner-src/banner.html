@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=block" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfbf9; --ink:#15191f; --muted:#5a6370; --card:#ffffff; --panel:#f2f3f1; --rule:#e2e5e3;
+  --blue:#1b5e93; --navy:#154b7d; --teal:#2a8f75; --teal-b:#38ab8c; --blue-soft:#e8f0f7; --teal-soft:#e5f4ef;
+  --wire:#c9d1cf; --violet:#7a5aa6; --grid:rgba(21,75,125,.045);
+}
+body.dark{
+  --bg:#0e141b; --ink:#e7ebee; --muted:#93a0ad; --card:#151e28; --panel:#1b2631; --rule:#263340;
+  --blue:#6fa8dc; --navy:#9cc7ee; --teal:#4cc3a1; --teal-b:#4cc3a1; --blue-soft:#1a2a3b; --teal-soft:#16302a;
+  --wire:#33414f; --violet:#b39ddb; --grid:rgba(111,168,220,.05);
+}
+*{box-sizing:border-box;margin:0}
+html,body{width:1280px;height:640px;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;position:relative;
+  background-image:radial-gradient(var(--grid) 1.2px,transparent 1.2px);background-size:22px 22px}
+.left{position:absolute;left:76px;top:0;bottom:0;width:560px;display:flex;flex-direction:column;justify-content:center}
+.brand{display:flex;align-items:center;gap:16px;margin-bottom:34px}
+.brand svg{width:66px;height:66px}
+body.dark #u stop:first-child{stop-color:#4a8fcf}
+body.dark .brand svg circle:first-of-type{stroke:#4a8fcf}
+.brand span{font-size:54px;font-weight:600;letter-spacing:-.02em;color:var(--navy)}
+h1{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:50px;line-height:1.08;letter-spacing:-.02em}
+h1 em{font-style:normal;background:linear-gradient(90deg,#1a5c93,#38ab8c);-webkit-background-clip:text;background-clip:text;color:transparent}
+body.dark h1 em{background:linear-gradient(90deg,#6fa8dc,#4cc3a1);-webkit-background-clip:text;background-clip:text}
+.sub{margin-top:20px;font-size:21px;line-height:1.5;color:var(--muted)}
+.chips{display:flex;gap:12px;margin-top:34px}
+.chip{font:500 17px "JetBrains Mono",monospace;padding:9px 15px;border-radius:9px;border:1px solid var(--rule);background:var(--card);color:var(--ink)}
+.chip b{color:var(--muted);font-weight:400}
+.chip.link{color:var(--blue)}
+
+.right{position:absolute;left:690px;top:56px;width:520px;height:528px}
+.row{position:absolute;left:0;right:0;display:flex;justify-content:space-between}
+.src{width:160px;background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:11px 13px}
+.src .tag{font:500 11.5px "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--teal)}
+.src .n{font-size:15.5px;font-weight:600;margin-top:2px}
+.src .d{font-size:12.5px;color:var(--muted);margin-top:2px}
+.space{position:absolute;left:70px;right:70px;top:150px;background:var(--card);border:1.5px solid var(--blue);border-radius:14px;overflow:hidden;
+  box-shadow:0 18px 40px -26px rgba(21,75,125,.45)}
+.space .h{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--rule)}
+.space .h b{font:600 14px "JetBrains Mono",monospace;color:var(--navy)}
+.space .h i{font:500 11.5px "JetBrains Mono",monospace;font-style:normal;color:var(--teal);background:var(--teal-soft);padding:3px 9px;border-radius:999px}
+.tree{font:12.6px/1.9 "JetBrains Mono",monospace;padding:8px 14px 9px;white-space:pre;color:var(--ink)}
+.tree .k{color:var(--muted)}.tree .s{color:var(--blue)}.tree .t{color:var(--violet)}.tree .m{color:var(--teal)}
+.out{width:160px;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:11px 13px}
+.out .n{font-size:15.5px;font-weight:600}
+.out .d{font:12px "JetBrains Mono",monospace;color:var(--muted);margin-top:3px}
+svg.wires{position:absolute;inset:0;width:520px;height:528px;overflow:visible}
+svg.wires path{fill:none;stroke-width:1.8}
+</style>
+</head>
+<body>
+<div class="left">
+  <div class="brand">
+    <svg viewBox="240 130 540 520" fill="none">
+      <defs><linearGradient id="u" x1="250" y1="0" x2="770" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1a5c93"/><stop offset="1" stop-color="#38ab8c"/></linearGradient></defs>
+      <path d="M319 253V470a133 133 0 0 0 133 133h117a133 133 0 0 0 133-133V253" stroke="url(#u)" stroke-width="30"/>
+      <circle cx="319" cy="205" r="48" stroke="#1b6094" stroke-width="30"/>
+      <circle cx="702" cy="205" r="48" stroke="#38ab8c" stroke-width="30"/>
+      <path d="M358 564L534 383M583 362H702" stroke="#36a88b" stroke-width="30"/>
+      <circle cx="555" cy="362" r="29" stroke="#36a88b" stroke-width="28"/>
+    </svg>
+    <span>UniEnv</span>
+  </div>
+  <h1>Robot environments, policies and data, <em>unified</em>.</h1>
+  <p class="sub">One set of typed spaces for simulators, real robots, datasets and policies, on NumPy, PyTorch or JAX.</p>
+  <div class="chips">
+    <span class="chip"><b>$</b> pip install unienv</span>
+    <span class="chip link">unienvorg.github.io</span>
+  </div>
+</div>
+
+<div class="right">
+  <svg class="wires" viewBox="0 0 520 528"><g id="win" stroke="var(--blue)" opacity=".55"><path/><path/><path/></g><g id="wout" stroke="var(--teal-b)" opacity=".75"><path/><path/><path/></g></svg>
+  <div class="row" style="top:0">
+    <div class="src"><div class="tag">Simulation</div><div class="n">Genesis</div><div class="d">ManiSkill · mjlab</div></div>
+    <div class="src"><div class="tag">Real robot</div><div class="n">DROID</div><div class="d">Tianji · Wuji · ZED</div></div>
+    <div class="src"><div class="tag">Dataset</div><div class="n">LeRobot</div><div class="d">DROID · HF datasets</div></div>
+  </div>
+  <div class="space">
+    <div class="h"><b>observation_space</b><i>numpy · torch · jax</i></div>
+<div class="tree"><span class="k">robot.arm</span>
+  joint_position  <span class="s">(7,)    </span><span class="t">float32 </span><span class="m">rad</span>
+  eef_quaternion  <span class="s">(4,)    </span><span class="t">float32 </span><span class="m">quat_wxyz</span>
+<span class="k">external_cam_0</span>
+  rgb             <span class="s">(H,W,3) </span><span class="t">uint8   </span><span class="m">image · HWC</span>
+  depth           <span class="s">(H,W)   </span><span class="t">float32 </span><span class="m">depth · m</span></div>
+  </div>
+  <div class="row" style="top:456px">
+    <div class="out"><div class="n">Policies</div><div class="d">get_action()</div></div>
+    <div class="out"><div class="n">Replay buffers</div><div class="d">Parquet · HDF5</div></div>
+    <div class="out"><div class="n">Remote</div><div class="d">TCP · WebSocket</div></div>
+  </div>
+</div>
+<script>
+document.body.className = location.hash === '#dark' ? 'dark' : '';
+document.fonts.ready.then(() => {
+  const R = document.querySelector('.right').getBoundingClientRect();
+  const box = e => { const b = e.getBoundingClientRect(); return {x: b.left - R.left, y: b.top - R.top, w: b.width, h: b.height}; };
+  const sp = box(document.querySelector('.space'));
+  const srcs = [...document.querySelectorAll('.src')].map(box), outs = [...document.querySelectorAll('.out')].map(box);
+  const tops = [sp.x + sp.w * .3, sp.x + sp.w / 2, sp.x + sp.w * .7];
+  document.querySelectorAll('#win path').forEach((p, i) => {
+    const s = srcs[i], x0 = s.x + s.w / 2, y0 = s.y + s.h, x1 = tops[i], y1 = sp.y, m = (y0 + y1) / 2;
+    p.setAttribute('d', `M${x0} ${y0} C${x0} ${m},${x1} ${m},${x1} ${y1}`);
+  });
+  document.querySelectorAll('#wout path').forEach((p, i) => {
+    const o = outs[i], x0 = tops[i], y0 = sp.y + sp.h, x1 = o.x + o.w / 2, y1 = o.y, m = (y0 + y1) / 2;
+    p.setAttribute('d', `M${x0} ${y0} C${x0} ${m},${x1} ${m},${x1} ${y1}`);
+  });
+  document.body.dataset.ready = 1;
+});
+</script>
+</body>
+</html>
