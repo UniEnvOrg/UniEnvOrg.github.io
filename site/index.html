@@ -126,6 +126,12 @@ h2{font-family:var(--serif);font-weight:600;font-size:36px;line-height:1.15;lett
 .use h3{font-size:15.5px;margin:0 0 3px;font-weight:600}
 .use p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.55}
 .use code{font-size:12.5px;color:#22364f}
+.demo{margin:0 0 28px}
+.demo video{display:block;width:100%;aspect-ratio:16/9;border-radius:14px;border:1px solid var(--rule);background:#0e141b}
+.demo figcaption{margin-top:10px;color:var(--muted);font-size:14px}
+.agents{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.agents .more{margin:14px 0 0;font-size:15px}
+@media (max-width:900px){.agents{grid-template-columns:1fr}}
 .codebox{background:#14202b;color:#e3e8ec;border-radius:14px;padding:20px 22px;font:12.5px/1.65 var(--mono);white-space:pre;overflow:auto;margin:0}
 
 /* pillars */
@@ -278,6 +284,7 @@ footer .sp{margin-left:auto}
   <nav class="top">
     <a href="https://unienvorg.github.io/UniEnv/">Docs</a>
     <a href="https://unienvorg.github.io/XBArray/">XBArray</a>
+    <a href="#agents">Agents</a>
     <a href="#performance">Performance</a>
     <a href="#ecosystem">Ecosystem</a>
     <a href="#cite">Cite</a>
@@ -346,6 +353,38 @@ env = WorldEnv(world, [
   </div>
   <p class="fig-note">A Franka FR3 with a Robotiq gripper: simulated with unienv-genesis, driven live with unienv-droid, or replayed from the DROID dataset. Select a source.</p>
 </div>
+
+<section id="agents"><div class="wrap">
+  <p class="eyebrow">Agents · MCP</p>
+  <h2>Hand any environment to an LLM agent.</h2>
+  <p class="sub"><code>pip install "unienv[mcp]"</code> serves environments and policies over the Model Context Protocol. An agent such as Claude or Codex looks at the scene, acts in it, and calls trained policies as skills.</p>
+  <figure class="demo">
+    <video src="media/mcp-demo.mp4" poster="media/mcp-demo-poster.jpg" autoplay muted loop playsinline controls preload="metadata"></video>
+    <figcaption>Codex in a LIBERO kitchen through UniEnv MCP: it sends end-effector actions itself to turn on the stove, then calls SmolVLA as a skill to put the wine bottle on the rack.</figcaption>
+  </figure>
+  <div class="agents">
+    <div>
+<pre class="codebox"><span class="k">from</span> unienv_mcp <span class="k">import</span> UniEnvMCPServer
+
+server = <span class="f">UniEnvMCPServer</span>(<span class="s">"lab"</span>)
+<span class="c"># tools: kitchen.reset, kitchen.step, kitchen.observe, ...</span>
+server.<span class="f">add_env</span>(<span class="s">"kitchen"</span>, make_env, dt=<span class="n">0.05</span>)
+<span class="c"># a skill: smolvla.run(task="...")</span>
+server.<span class="f">add_policy</span>(<span class="s">"smolvla"</span>, make_policy)
+server.<span class="f">run</span>(<span class="s">"stdio"</span>)   <span class="c"># or server.run("http", port=8000)</span></pre>
+      <p class="more" style="color:var(--muted)">Or from the command line, as a server an MCP host can start:</p>
+<pre class="codebox" style="margin-top:10px"><span class="c">$</span> unienv-mcp serve mypkg.envs:make_env --name kitchen \
+    --policy mypkg.policies:make_policy=smolvla</pre>
+      <p class="more"><a href="https://unienvorg.github.io/UniEnv/latest/guides/mcp/">Read the MCP guide →</a></p>
+    </div>
+    <div class="uses">
+      <div class="use"><span class="when">tools</span><div><h3>Generated from your spaces</h3><p>Each environment gets <code>describe</code>, <code>reset</code>, <code>step</code>, <code>observe</code> and <code>render</code>. Actions are a JSON Schema built from the action space, with names, bounds and units; an out-of-bounds action is an error the model can correct.</p></div></div>
+      <div class="use"><span class="when">cameras</span><div><h3>Observations as images</h3><p>Leaves whose metadata says <code>kind="image"</code> come back as pictures, a bounded number per result so they don't flood the model's context.</p></div></div>
+      <div class="use"><span class="when">skills</span><div><h3>Policies the agent can call</h3><p><code>smolvla.run(task=…)</code> runs a policy closed-loop until the episode ends; the task is the instruction for language-conditioned policies.</p></div></div>
+      <div class="use"><span class="when">robots</span><div><h3>Safe on real hardware</h3><p><code>physical=True</code> marks the acting tools so the host asks before calling them, and <code>host</code> hands the live instance to a script or viewer over the remote layer.</p></div></div>
+    </div>
+  </div>
+</div></section>
 
 <section><div class="wrap meta">
   <div>
